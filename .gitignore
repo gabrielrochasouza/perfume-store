@@ -1,0 +1,14 @@
+.next/
+node_modules/
+.env.local
+.env.*.local
+dist/
+build/
+*.log
+*.pem
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/settings.json
+.vercel
