@@ -5,10 +5,8 @@ import Lenis from 'lenis';
 
 export function SmoothScrollProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    });
+    // lerp: 0.1 (default) — snappy but smooth, avoids the 1.2s duration lag
+    const lenis = new Lenis({ lerp: 0.1 });
 
     let rafId: number;
     function raf(time: number) {

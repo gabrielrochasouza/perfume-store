@@ -9,6 +9,29 @@ interface Props {
   mouseY: number;
 }
 
+// Pre-allocate reusable materials — avoids garbage collection per frame
+const glassMat = new THREE.MeshStandardMaterial({
+  color: new THREE.Color('#C9A227'),
+  metalness: 0.15,
+  roughness: 0.12,
+  envMapIntensity: 2.5,
+  transparent: true,
+  opacity: 0.82,
+});
+
+const goldMat = new THREE.MeshStandardMaterial({
+  color: new THREE.Color('#C9A227'),
+  metalness: 0.95,
+  roughness: 0.07,
+  envMapIntensity: 2,
+});
+
+const deepGoldMat = new THREE.MeshStandardMaterial({
+  color: new THREE.Color('#9d7b1a'),
+  metalness: 0.98,
+  roughness: 0.04,
+});
+
 export function PerfumeBottle({ mouseX, mouseY }: Props) {
   const groupRef = useRef<THREE.Group>(null);
 
@@ -23,64 +46,30 @@ export function PerfumeBottle({ mouseX, mouseY }: Props) {
   });
 
   return (
-    <group ref={groupRef} scale={1.15}>
-      {/* Main body — amber glass */}
-      <mesh castShadow>
+    <group ref={groupRef} scale={0.82}>
+      {/* Main body — amber tinted glass (no transmission = no extra render pass) */}
+      <mesh material={glassMat}>
         <boxGeometry args={[0.72, 2.1, 0.44]} />
-        <meshPhysicalMaterial
-          color="#C9A227"
-          transmission={0.82}
-          thickness={0.7}
-          roughness={0.06}
-          metalness={0.04}
-          ior={1.5}
-          transparent
-          opacity={0.88}
-          envMapIntensity={2}
-        />
       </mesh>
 
       {/* Bottom accent bar */}
-      <mesh position={[0, -1.13, 0]} castShadow>
+      <mesh position={[0, -1.13, 0]} material={goldMat}>
         <boxGeometry args={[0.76, 0.08, 0.48]} />
-        <meshStandardMaterial
-          color="#C9A227"
-          metalness={0.92}
-          roughness={0.08}
-          envMapIntensity={2}
-        />
       </mesh>
 
       {/* Neck taper */}
-      <mesh position={[0, 1.18, 0]} castShadow>
-        <cylinderGeometry args={[0.14, 0.3, 0.2, 32]} />
-        <meshStandardMaterial
-          color="#C9A227"
-          metalness={0.93}
-          roughness={0.07}
-          envMapIntensity={2}
-        />
+      <mesh position={[0, 1.18, 0]} material={goldMat}>
+        <cylinderGeometry args={[0.14, 0.3, 0.2, 24]} />
       </mesh>
 
       {/* Cap */}
-      <mesh position={[0, 1.46, 0]} castShadow>
+      <mesh position={[0, 1.46, 0]} material={goldMat}>
         <boxGeometry args={[0.48, 0.52, 0.32]} />
-        <meshStandardMaterial
-          color="#C9A227"
-          metalness={0.93}
-          roughness={0.07}
-          envMapIntensity={2}
-        />
       </mesh>
 
-      {/* Cap top knob */}
-      <mesh position={[0, 1.74, 0]} castShadow>
-        <cylinderGeometry args={[0.09, 0.09, 0.07, 16]} />
-        <meshStandardMaterial
-          color="#9d7b1a"
-          metalness={0.98}
-          roughness={0.04}
-        />
+      {/* Cap knob */}
+      <mesh position={[0, 1.74, 0]} material={deepGoldMat}>
+        <cylinderGeometry args={[0.09, 0.09, 0.07, 12]} />
       </mesh>
     </group>
   );

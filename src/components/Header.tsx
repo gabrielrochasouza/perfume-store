@@ -1,13 +1,37 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ShoppingBag, Search, Menu, X, Sparkles } from 'lucide-react';
 import { useCartStore } from '@/store/cart';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export function Header() {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const cartItems = useCartStore((state) => state.getTotalItems());
+
+  useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (searchOpen) {
+      setTimeout(() => searchInputRef.current?.focus(), 50);
+    }
+  }, [searchOpen]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = searchQuery.trim();
+    if (q) {
+      router.push(`/produtos?q=${encodeURIComponent(q)}`);
+    }
+    setSearchOpen(false);
+    setSearchQuery('');
+  };
 
   return (
     <header className="bg-accent text-dark sticky top-0 z-50 border-b-2 border-dark/20 shadow-lg">
@@ -26,30 +50,34 @@ export function Header() {
         <nav className="hidden lg:flex gap-8 xl:gap-12">
           <Link href="/" className="text-xs md:text-sm font-medium tracking-wide text-dark hover:text-dark/60 transition-colors duration-300 relative group">
             Home
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-dark group-hover:w-full transition-all duration-300"></span>
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-dark group-hover:w-full transition-all duration-300" />
           </Link>
           <Link href="/produtos" className="text-xs md:text-sm font-medium tracking-wide text-dark hover:text-dark/60 transition-colors duration-300 relative group">
             Produtos
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-dark group-hover:w-full transition-all duration-300"></span>
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-dark group-hover:w-full transition-all duration-300" />
           </Link>
-          <a href="#beneficios" className="text-xs md:text-sm font-medium tracking-wide text-dark hover:text-dark/60 transition-colors duration-300 relative group">
-            Benefícios
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-dark group-hover:w-full transition-all duration-300"></span>
-          </a>
+          <Link href="/pedidos" className="text-xs md:text-sm font-medium tracking-wide text-dark hover:text-dark/60 transition-colors duration-300 relative group">
+            Pedidos
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-dark group-hover:w-full transition-all duration-300" />
+          </Link>
           <a href="#contato" className="text-xs md:text-sm font-medium tracking-wide text-dark hover:text-dark/60 transition-colors duration-300 relative group">
             Contato
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-dark group-hover:w-full transition-all duration-300"></span>
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-dark group-hover:w-full transition-all duration-300" />
           </a>
         </nav>
 
         {/* Right Actions */}
         <div className="flex items-center gap-3 md:gap-4">
-          <button className="p-2 text-dark hover:text-dark/60 transition-all duration-300 hover:scale-110 rounded-full hover:bg-dark/10">
-            <Search size={20} strokeWidth={1.5} />
+          <button
+            onClick={() => setSearchOpen((v) => !v)}
+            className="p-2 text-dark hover:text-dark/60 transition-all duration-300 hover:scale-110 rounded-full hover:bg-dark/10"
+            aria-label="Buscar"
+          >
+            {searchOpen ? <X size={20} strokeWidth={1.5} /> : <Search size={20} strokeWidth={1.5} />}
           </button>
           <Link href="/carrinho" className="p-2 text-dark hover:text-dark/60 transition-all duration-300 relative group hover:scale-110 rounded-full hover:bg-dark/10">
             <ShoppingBag size={20} strokeWidth={1.5} />
-            {cartItems > 0 && (
+            {mounted && cartItems > 0 && (
               <span className="absolute -top-1 -right-1 bg-dark text-accent text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center group-hover:scale-125 transition-transform shadow-md">
                 {cartItems}
               </span>
@@ -65,6 +93,32 @@ export function Header() {
           </button>
         </div>
       </div>
+
+      {/* Search bar */}
+      {searchOpen && (
+        <form
+          onSubmit={handleSearch}
+          className="border-t border-dark/10 px-4 py-2.5 flex items-center gap-3 bg-accent/95 animate-fade-in"
+        >
+          <Search size={16} strokeWidth={1.5} className="text-dark/40 flex-shrink-0" />
+          <input
+            ref={searchInputRef}
+            type="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Buscar perfumes, marcas..."
+            className="flex-1 bg-transparent outline-none text-dark placeholder:text-dark/35 text-sm font-light"
+          />
+          {searchQuery && (
+            <button
+              type="submit"
+              className="text-xs font-medium text-dark/60 hover:text-dark transition-colors px-2"
+            >
+              Buscar
+            </button>
+          )}
+        </form>
+      )}
 
       {/* Mobile Navigation */}
       {isOpen && (
@@ -83,13 +137,13 @@ export function Header() {
           >
             Produtos
           </Link>
-          <a
-            href="#beneficios"
+          <Link
+            href="/pedidos"
             className="block px-4 py-2 text-sm font-medium text-dark hover:text-dark/60 hover:bg-dark/10 rounded-lg transition-all duration-300"
             onClick={() => setIsOpen(false)}
           >
-            Benefícios
-          </a>
+            Pedidos
+          </Link>
           <a
             href="#contato"
             className="block px-4 py-2 text-sm font-medium text-dark hover:text-dark/60 hover:bg-dark/10 rounded-lg transition-all duration-300"

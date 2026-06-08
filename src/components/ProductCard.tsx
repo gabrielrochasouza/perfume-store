@@ -1,8 +1,10 @@
 'use client';
 
+import Link from 'next/link';
 import Image from 'next/image';
 import { Heart, ShoppingCart, Star, Zap } from 'lucide-react';
 import { Product } from '@/types';
+import { useToastStore } from '@/store/toast';
 
 interface ProductCardProps {
   product: Product;
@@ -11,11 +13,12 @@ interface ProductCardProps {
 
 export function ProductCard({ product, onAddToCart }: ProductCardProps) {
   const isLowStock = product.estoqueAtual && product.estoqueAtual < 5;
+  const showToast = useToastStore((s) => s.show);
 
   return (
     <div className="group bg-light text-dark rounded-lg overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-accent/30">
-      {/* Image Container */}
-      <div className="relative h-64 bg-gray-200 overflow-hidden">
+      {/* Image Container — entire area navigates to product detail */}
+      <Link href={`/produto/${product.slug}`} className="block relative h-64 bg-gray-200 overflow-hidden">
         <Image
           src={product.imagem}
           alt={product.nome}
@@ -39,10 +42,13 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
         </div>
 
         {/* Wishlist Button */}
-        <button className="absolute bottom-4 right-4 bg-white text-dark p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-accent hover:text-white hover:scale-110">
+        <button
+          onClick={(e) => e.preventDefault()}
+          className="absolute bottom-4 right-4 bg-white text-dark p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-accent hover:text-white hover:scale-110"
+        >
           <Heart size={20} strokeWidth={1.5} />
         </button>
-      </div>
+      </Link>
 
       {/* Content */}
       <div className="p-5">
@@ -80,7 +86,10 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
             Ver Detalhes
           </a>
           <button
-            onClick={() => onAddToCart?.(product)}
+            onClick={() => {
+              onAddToCart?.(product);
+              showToast(`${product.nome} adicionado ao carrinho`, 'add');
+            }}
             className="w-full py-2.5 bg-accent text-white rounded-lg font-light text-sm tracking-wide hover:bg-primary-600 transition-all duration-300 flex items-center justify-center gap-2 group/btn"
           >
             <ShoppingCart size={16} strokeWidth={1.5} className="group-hover/btn:scale-110 transition-transform" />

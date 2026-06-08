@@ -2,7 +2,7 @@
 
 import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Environment, Float, ContactShadows } from '@react-three/drei';
+import { Environment, Float } from '@react-three/drei';
 import { PerfumeBottle } from './PerfumeBottle';
 import { Particles } from './Particles';
 
@@ -14,18 +14,22 @@ interface Props {
 export default function PerfumeScene({ mouseX, mouseY }: Props) {
   return (
     <Canvas
-      dpr={[1, 1.5]}
+      dpr={1}                        // cap at 1× — halves pixel count on retina
       camera={{ position: [0, 0, 5.5], fov: 36 }}
-      gl={{ antialias: true, alpha: true }}
+      gl={{
+        antialias: false,            // disable MSAA for perf
+        alpha: true,
+        powerPreference: 'high-performance',
+      }}
       style={{ width: '100%', height: '100%' }}
     >
       <Suspense fallback={null}>
-        <ambientLight intensity={0.6} />
-        <directionalLight position={[6, 8, 4]} intensity={2.2} color="#ffffff" castShadow />
+        <ambientLight intensity={0.65} />
+        <directionalLight position={[6, 8, 4]} intensity={2.2} color="#ffffff" />
         <directionalLight position={[-5, -2, -4]} intensity={1} color="#C9A227" />
         <pointLight position={[3, 2, 5]} intensity={1.8} color="#C9A227" />
-        <pointLight position={[-3, 4, -2]} intensity={0.7} color="#ffffff" />
 
+        {/* Environment for reflections only — no background render */}
         <Environment preset="studio" />
 
         <Particles />
@@ -33,15 +37,7 @@ export default function PerfumeScene({ mouseX, mouseY }: Props) {
         <Float speed={1.4} floatIntensity={0.3} rotationIntensity={0}>
           <PerfumeBottle mouseX={mouseX} mouseY={mouseY} />
         </Float>
-
-        <ContactShadows
-          position={[0, -1.9, 0]}
-          opacity={0.4}
-          scale={5}
-          blur={2.5}
-          far={4}
-          color="#C9A227"
-        />
+        {/* ContactShadows removed — was an extra render pass every frame */}
       </Suspense>
     </Canvas>
   );

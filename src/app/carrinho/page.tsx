@@ -1,36 +1,26 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 import { useCartStore } from '@/store/cart';
-import { Trash2, Plus, Minus, MessageCircle } from 'lucide-react';
+import { CheckoutModal } from '@/components/CheckoutModal';
+import { useToastStore } from '@/store/toast';
+import { Trash2, Plus, Minus, ShoppingCart } from 'lucide-react';
 
 export default function CarrinhoPage() {
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
   const items = useCartStore((state) => state.items);
   const removeItem = useCartStore((state) => state.removeItem);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const clearCart = useCartStore((state) => state.clearCart);
   const getTotalPrice = useCartStore((state) => state.getTotalPrice);
+  const showToast = useToastStore((s) => s.show);
 
   const total = getTotalPrice();
   const freeShippingThreshold = 299;
   const hasShipping = total < freeShippingThreshold;
   const shippingCost = 30;
   const finalTotal = total + (hasShipping ? shippingCost : 0);
-
-  const handleBuyOnWhatsApp = () => {
-    let message = 'Olá! Gostaria de fazer o seguinte pedido:\n\n🛍️ Produtos:\n\n';
-    items.forEach((item) => {
-      message += `• ${item.nome} - ${item.volume}\n  Quantidade: ${item.quantidadeCarrinho}\n  Valor: R$ ${(item.preco * item.quantidadeCarrinho).toFixed(2)}\n\n`;
-    });
-    message += hasShipping
-      ? `📦 Frete: R$ ${shippingCost.toFixed(2)}\n`
-      : `📦 Frete: Grátis\n`;
-    message += `\n💰 Total do Pedido: R$ ${finalTotal.toFixed(2)}\n\nObrigado!`;
-
-    const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '5511999999999';
-    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
-    clearCart();
-  };
 
   if (items.length === 0) {
     return (
@@ -121,7 +111,10 @@ export default function CarrinhoPage() {
                         .replace('.', ',')}
                     </span>
                     <button
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => {
+                        removeItem(item.id);
+                        showToast(`${item.nome} removido do carrinho`, 'remove');
+                      }}
                       className="text-red-500 hover:text-red-700 transition-colors"
                     >
                       <Trash2 size={16} strokeWidth={1.5} />
@@ -132,7 +125,7 @@ export default function CarrinhoPage() {
             ))}
 
             <button
-              onClick={clearCart}
+              onClick={() => { clearCart(); showToast('Carrinho limpo', 'remove'); }}
               className="mt-2 text-red-500 hover:text-red-700 font-light text-sm transition-colors duration-300"
             >
               Limpar Carrinho
@@ -178,11 +171,11 @@ export default function CarrinhoPage() {
               </div>
 
               <button
-                onClick={handleBuyOnWhatsApp}
+                onClick={() => setCheckoutOpen(true)}
                 className="w-full bg-dark text-white py-3 flex items-center justify-center gap-2 mb-3 font-light rounded-lg hover:bg-dark/80 transition-colors"
               >
-                <MessageCircle size={20} strokeWidth={1.5} />
-                Finalizar no WhatsApp
+                <ShoppingCart size={20} strokeWidth={1.5} />
+                Finalizar Pedido
               </button>
 
               <a
@@ -195,6 +188,8 @@ export default function CarrinhoPage() {
           </div>
         </div>
       </div>
+
+      {checkoutOpen && <CheckoutModal onClose={() => setCheckoutOpen(false)} />}
     </main>
   );
 }

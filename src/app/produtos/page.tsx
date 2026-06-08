@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { ChevronDown, SlidersHorizontal } from 'lucide-react';
 import { products } from '@/data/products';
 import { ProductCard } from '@/components/ProductCard';
@@ -19,6 +19,11 @@ export default function ProdutosPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('popular');
   const [filtersOpen, setFiltersOpen] = useState(false);
+
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get('q');
+    if (q) setSearchTerm(q);
+  }, []);
   const addItem = useCartStore((state) => state.addItem);
 
   const filteredProducts = useMemo(() => {

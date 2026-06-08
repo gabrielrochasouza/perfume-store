@@ -5,6 +5,7 @@ import { Footer } from '@/components/Footer';
 import { WhatsAppBanner } from '@/components/WhatsAppBanner';
 import { SmoothScrollProvider } from '@/components/SmoothScrollProvider';
 import { Preloader } from '@/components/Preloader';
+import { ToastContainer } from '@/components/ToastContainer';
 import '@/styles.css';
 
 const playfair = Playfair_Display({
@@ -30,6 +31,10 @@ export const metadata: Metadata = {
   description:
     'Loja de perfumes premium com as melhores fragrâncias importadas e nacionais. Entrega rápida e segura.',
   keywords: ['perfumes', 'fragrâncias', 'premium', 'importados', 'original'],
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+  },
   openGraph: {
     type: 'website',
     url: 'https://perfume-store.com',
@@ -52,6 +57,7 @@ export default function RootLayout({
     >
       <body className="bg-dark text-white">
         <Preloader />
+        <ToastContainer />
         <SmoothScrollProvider>
           <WhatsAppBanner />
           <Header />

@@ -1,16 +1,20 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { getProductBySlug, products } from '@/data/products';
 import { useCartStore } from '@/store/cart';
 import { ProductCard } from '@/components/ProductCard';
+import { useToastStore } from '@/store/toast';
 import { ShoppingBag, Heart } from 'lucide-react';
 
 export default function ProductPage({ params }: { params: { slug: string } }) {
   const product = getProductBySlug(params.slug);
   const [quantity, setQuantity] = useState(1);
   const addItem = useCartStore((state) => state.addItem);
+  const router = useRouter();
+  const showToast = useToastStore((s) => s.show);
 
   if (!product) {
     return (
@@ -42,13 +46,12 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
 
   const handleAddToCart = () => {
     addItem(product, quantity);
-    setQuantity(1);
+    showToast(`${product.nome} adicionado ao carrinho`, 'add');
   };
 
-  const handleBuyOnWhatsApp = () => {
-    const message = `Olá! Gostaria de comprar:\n\n🛍️ ${product.nome}\n📦 Volume: ${product.volume}\n📊 Quantidade: ${quantity}\n💰 Valor total: R$ ${(product.preco * quantity).toFixed(2)}\n\nObrigado!`;
-    const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '5511999999999';
-    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
+  const handleFinishPurchase = () => {
+    addItem(product, quantity);
+    router.push('/carrinho');
   };
 
   return (
@@ -176,10 +179,10 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
               </button>
 
               <button
-                onClick={handleBuyOnWhatsApp}
+                onClick={handleFinishPurchase}
                 className="w-full bg-dark text-white py-3.5 font-light text-sm tracking-wide hover:bg-dark/80 transition-colors rounded-lg"
               >
-                Comprar via WhatsApp
+                Finalizar Compra
               </button>
             </div>
           </div>

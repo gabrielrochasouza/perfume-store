@@ -4,7 +4,17 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-export function Particles({ count = 200 }: { count?: number }) {
+// Shared material — created once
+const particleMat = new THREE.PointsMaterial({
+  size: 0.022,
+  color: new THREE.Color('#C9A227'),
+  sizeAttenuation: true,
+  transparent: true,
+  opacity: 0.45,
+  depthWrite: false,
+});
+
+export function Particles({ count = 80 }: { count?: number }) {
   const pointsRef = useRef<THREE.Points>(null);
 
   const geometry = useMemo(() => {
@@ -26,16 +36,5 @@ export function Particles({ count = 200 }: { count?: number }) {
     pointsRef.current.rotation.x = Math.sin(t * 0.007) * 0.05;
   });
 
-  return (
-    <points ref={pointsRef} geometry={geometry}>
-      <pointsMaterial
-        size={0.022}
-        color="#C9A227"
-        sizeAttenuation
-        transparent
-        opacity={0.5}
-        depthWrite={false}
-      />
-    </points>
-  );
+  return <points ref={pointsRef} geometry={geometry} material={particleMat} />;
 }

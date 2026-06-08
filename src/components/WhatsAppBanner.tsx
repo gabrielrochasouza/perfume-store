@@ -1,10 +1,10 @@
 'use client';
 
 import { MessageCircle } from 'lucide-react';
+import { siteConfig } from '@/config/site';
 
 export function WhatsAppBanner() {
-  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '5511999999999';
-  const whatsappLink = `https://wa.me/${whatsappNumber}?text=Olá! Gostaria de mais informações sobre os perfumes.`;
+  const whatsappLink = `https://wa.me/${siteConfig.whatsapp}?text=Olá! Gostaria de mais informações sobre os perfumes.`;
 
   return (
     <div className="bg-dark text-white py-1.5 sticky top-0 z-40">
@@ -19,7 +19,7 @@ export function WhatsAppBanner() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          +55 (11) 99999-9999
+          {siteConfig.phone}
         </a>
       </div>
     </div>
