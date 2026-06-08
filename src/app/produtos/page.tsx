@@ -1,0 +1,170 @@
+'use client';
+
+import { useState, useMemo } from 'react';
+import { products } from '@/data/products';
+import { ProductCard } from '@/components/ProductCard';
+import { useCartStore } from '@/store/cart';
+
+const categories = ['Todos', 'Masculino', 'Feminino', 'Unissex', 'Importados'];
+const sortOptions = [
+  { label: 'Mais vendidos', value: 'popular' },
+  { label: 'Menor preço', value: 'price-asc' },
+  { label: 'Maior preço', value: 'price-desc' },
+  { label: 'Lançamentos', value: 'newest' },
+];
+
+export default function ProdutosPage() {
+  const [selectedCategory, setSelectedCategory] = useState('Todos');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('popular');
+  const addItem = useCartStore((state) => state.addItem);
+
+  // Filter and sort products
+  const filteredProducts = useMemo(() => {
+    let result = [...products];
+
+    // Filter by category
+    if (selectedCategory !== 'Todos') {
+      result = result.filter(
+        (p) => p.categoria === selectedCategory.toLowerCase()
+      );
+    }
+
+    // Filter by search term
+    if (searchTerm) {
+      result = result.filter(
+        (p) =>
+          p.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          p.marca.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Sort
+    switch (sortBy) {
+      case 'price-asc':
+        result.sort((a, b) => a.preco - b.preco);
+        break;
+      case 'price-desc':
+        result.sort((a, b) => b.preco - a.preco);
+        break;
+      case 'newest':
+        result.reverse();
+        break;
+      default:
+        result.sort((a, b) => (b.destaque ? 1 : 0) - (a.destaque ? 1 : 0));
+    }
+
+    return result;
+  }, [selectedCategory, searchTerm, sortBy]);
+
+  const handleAddToCart = (product: typeof products[0]) => {
+    addItem(product, 1);
+    // Toast notification would go here
+  };
+
+  return (
+    <main className="min-h-screen bg-white">
+      {/* Header */}
+      <section className="bg-dark text-white py-16 border-b border-accent/10">
+        <div className="container-custom">
+          <h1 className="font-elegant text-5xl md:text-6xl font-light tracking-tight">
+            Nossa Coleção
+          </h1>
+          <p className="text-gray-300 mt-3 font-light">
+            {filteredProducts.length} {filteredProducts.length === 1 ? 'produto' : 'produtos'} encontrados
+          </p>
+        </div>
+      </section>
+
+      <div className="container-custom py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          {/* Sidebar Filters */}
+          <aside className="lg:col-span-1">
+            <div className="mb-8 sticky top-24">
+              <h3 className="font-elegant text-lg font-light mb-4 tracking-wide">Filtros</h3>
+              
+              {/* Search Box */}
+              <div className="mb-6">
+                <label className="font-light text-sm text-gray-600 mb-2 block">Buscar</label>
+                <input
+                  type="text"
+                  placeholder="Nome ou marca..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent font-light text-sm"
+                />
+              </div>
+
+              {/* Categories */}
+              <div className="mb-6">
+                <label className="font-light text-sm text-gray-600 mb-2 block">Categoria</label>
+                <div className="space-y-2">
+                  {categories.map((category) => (
+                    <button
+                      key={category}
+                      onClick={() => setSelectedCategory(category)}
+                      className={`block w-full text-left px-3 py-2 text-sm rounded-lg transition-all duration-300 font-light ${
+                        selectedCategory === category
+                          ? 'bg-accent text-white shadow-md'
+                          : 'hover:bg-light border border-transparent hover:border-accent/30'
+                      }`}
+                    >
+                      {category}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sort */}
+              <div>
+                <label className="font-light text-sm text-gray-600 mb-2 block">Ordenar por</label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent font-light text-sm"
+                >
+                  {sortOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </aside>
+
+            {/* Products Grid */}
+            <div className="lg:col-span-4">
+              {filteredProducts.length > 0 ? (
+                <>
+                  <div className="mb-6">
+                    <p className="text-gray-600 font-light text-sm">
+                      Mostrando {filteredProducts.length} {filteredProducts.length === 1 ? 'produto' : 'produtos'}
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredProducts.map((product) => (
+                      <ProductCard
+                        key={product.id}
+                        product={product}
+                        onAddToCart={handleAddToCart}
+                      />
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-24">
+                  <p className="text-gray-600 text-lg font-light mb-4">
+                    Nenhum produto encontrado
+                  </p>
+                  <p className="text-gray-500 font-light text-sm">
+                    Tente ajustar os filtros de busca
+                  </p>
+                </div>
+              )}
+            </div>
+        </div>
+      </div>
+    </main>
+  );
+}
