@@ -35,14 +35,15 @@ const deepGoldMat = new THREE.MeshStandardMaterial({
 export function PerfumeBottle({ mouseX, mouseY }: Props) {
   const groupRef = useRef<THREE.Group>(null);
 
-  useFrame(() => {
+  useFrame((state) => {
     if (!groupRef.current) return;
+    const t = state.clock.getElapsedTime();
+    // Slow continuous Y rotation + mouse offset
+    groupRef.current.rotation.y = t * 0.25 + mouseX * 0.22;
+    // Smooth X tilt from mouse
     const targetX = mouseY * 0.14;
-    const targetY = mouseX * 0.22;
     groupRef.current.rotation.x +=
       (targetX - groupRef.current.rotation.x) * 0.04;
-    groupRef.current.rotation.y +=
-      (targetY - groupRef.current.rotation.y) * 0.04;
   });
 
   return (

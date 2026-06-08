@@ -6,15 +6,15 @@ import * as THREE from 'three';
 
 // Shared material — created once
 const particleMat = new THREE.PointsMaterial({
-  size: 0.022,
+  size: 0.06,
   color: new THREE.Color('#C9A227'),
   sizeAttenuation: true,
   transparent: true,
-  opacity: 0.45,
+  opacity: 0.55,
   depthWrite: false,
 });
 
-export function Particles({ count = 80 }: { count?: number }) {
+export function Particles({ count = 120 }: { count?: number }) {
   const pointsRef = useRef<THREE.Points>(null);
 
   const geometry = useMemo(() => {
