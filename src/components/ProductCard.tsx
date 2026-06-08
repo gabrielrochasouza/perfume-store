@@ -13,7 +13,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
   const isLowStock = product.estoqueAtual && product.estoqueAtual < 5;
 
   return (
-    <div className="group bg-light rounded-lg overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-accent/30">
+    <div className="group bg-light text-dark rounded-lg overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-accent/30">
       {/* Image Container */}
       <div className="relative h-64 bg-gray-200 overflow-hidden">
         <Image

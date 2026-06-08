@@ -3,6 +3,8 @@ import { Playfair_Display, Inter, Cormorant_Garamond } from 'next/font/google';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { WhatsAppBanner } from '@/components/WhatsAppBanner';
+import { SmoothScrollProvider } from '@/components/SmoothScrollProvider';
+import { Preloader } from '@/components/Preloader';
 import '@/styles.css';
 
 const playfair = Playfair_Display({
@@ -25,13 +27,15 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'Perfume Store - Perfumes Premium',
-  description: 'Loja de perfumes premium com as melhores fragrâncias importadas e nacionais. Entrega rápida e segura.',
+  description:
+    'Loja de perfumes premium com as melhores fragrâncias importadas e nacionais. Entrega rápida e segura.',
   keywords: ['perfumes', 'fragrâncias', 'premium', 'importados', 'original'],
   openGraph: {
     type: 'website',
     url: 'https://perfume-store.com',
     title: 'Perfume Store - Perfumes Premium',
-    description: 'Loja de perfumes premium com as melhores fragrâncias importadas e nacionais.',
+    description:
+      'Loja de perfumes premium com as melhores fragrâncias importadas e nacionais.',
     siteName: 'Perfume Store',
   },
 };
@@ -42,12 +46,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR" className={`${playfair.variable} ${cormorant.variable} ${inter.variable}`}>
-      <body className="bg-white text-dark">
-        <WhatsAppBanner />
-        <Header />
-        {children}
-        <Footer />
+    <html
+      lang="pt-BR"
+      className={`${playfair.variable} ${cormorant.variable} ${inter.variable}`}
+    >
+      <body className="bg-dark text-white">
+        <Preloader />
+        <SmoothScrollProvider>
+          <WhatsAppBanner />
+          <Header />
+          {children}
+          <Footer />
+        </SmoothScrollProvider>
       </body>
     </html>
   );

@@ -1,6 +1,7 @@
 
 const nextConfig = {
   reactStrictMode: true,
+  transpilePackages: ['three'],
   images: {
     remotePatterns: [
       {
