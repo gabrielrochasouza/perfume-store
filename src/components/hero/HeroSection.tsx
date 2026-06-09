@@ -1,7 +1,39 @@
 'use client';
 
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { GoldenNetwork } from './GoldenNetwork';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
+
+const SLIDES = [
+  {
+    id: 1,
+    src: 'https://images.pexels.com/photos/10873814/pexels-photo-10873814.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    alt: 'Perfume de luxo',
+  },
+  {
+    id: 2,
+    src: 'https://images.pexels.com/photos/4154204/pexels-photo-4154204.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    alt: 'Fragrância premium',
+  },
+  {
+    id: 3,
+    src: 'https://images.pexels.com/photos/15096784/pexels-photo-15096784.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    alt: 'Coleção exclusiva',
+  },
+  {
+    id: 4,
+    src: 'https://images.pexels.com/photos/23230653/pexels-photo-23230653.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    alt: 'Perfumaria sofisticada',
+  },
+  {
+    id: 5,
+    src: 'https://images.pexels.com/photos/9790391/pexels-photo-9790391.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    alt: 'Fragrância exclusiva',
+  },
+];
+
+const INTERVAL = 5500;
 
 const letterVariants = {
   hidden: { y: '110%' },
@@ -37,16 +69,43 @@ function RevealText({ text, className = '' }: { text: string; className?: string
 }
 
 export function HeroSection() {
+  const [current, setCurrent] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  const next = useCallback(() => setCurrent((p) => (p + 1) % SLIDES.length), []);
+  const prev = useCallback(() => setCurrent((p) => (p - 1 + SLIDES.length) % SLIDES.length), []);
+
+  useEffect(() => {
+    if (paused) return;
+    const t = setInterval(next, INTERVAL);
+    return () => clearInterval(t);
+  }, [paused, next]);
+
   return (
     <section className="relative min-h-screen bg-dark flex items-center overflow-hidden">
-      {/* Animated golden network background */}
-      <div className="absolute inset-0 z-0">
-        <GoldenNetwork />
-      </div>
+      {/* Carousel background */}
+      {SLIDES.map((slide, i) => (
+        <div
+          key={slide.id}
+          className={`absolute inset-0 z-0 transition-opacity duration-1000 ${
+            i === current ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          <Image
+            src={slide.src}
+            alt={slide.alt}
+            fill
+            priority={i === 0}
+            sizes="100vw"
+            className="object-cover"
+            style={i === current ? { animation: 'heroKenBurns 8s ease-out forwards' } : {}}
+          />
+        </div>
+      ))}
 
-      {/* Depth gradients */}
-      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-dark/88 via-dark/30 to-transparent pointer-events-none" />
-      <div className="absolute inset-0 z-[1] bg-gradient-to-t from-dark/75 via-transparent to-dark/20 pointer-events-none" />
+      {/* Depth overlays */}
+      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-dark/90 via-dark/60 to-dark/25 pointer-events-none" />
+      <div className="absolute inset-0 z-[1] bg-gradient-to-t from-dark/80 via-transparent to-dark/25 pointer-events-none" />
 
       {/* Content */}
       <div className="relative z-[2] container-custom py-28 lg:py-36">
@@ -102,6 +161,45 @@ export function HeroSection() {
             VER DESTAQUES
           </a>
         </motion.div>
+      </div>
+
+      {/* Arrow navigation */}
+      <button
+        onClick={() => { prev(); setPaused(true); }}
+        aria-label="Slide anterior"
+        className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 z-[3] p-2.5 border border-white/15 text-white/50 hover:border-accent/60 hover:text-accent transition-all duration-300 bg-dark/20 backdrop-blur-sm"
+      >
+        <ChevronLeft size={20} strokeWidth={1.5} />
+      </button>
+      <button
+        onClick={() => { next(); setPaused(true); }}
+        aria-label="Próximo slide"
+        className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 z-[3] p-2.5 border border-white/15 text-white/50 hover:border-accent/60 hover:text-accent transition-all duration-300 bg-dark/20 backdrop-blur-sm"
+      >
+        <ChevronRight size={20} strokeWidth={1.5} />
+      </button>
+
+      {/* Slide counter + dots */}
+      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-[3] flex flex-col items-center gap-3">
+        <div className="flex items-center gap-2">
+          {SLIDES.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => { setCurrent(i); setPaused(true); }}
+              aria-label={`Slide ${i + 1}`}
+              className="py-2 flex items-center"
+            >
+              <span
+                className={`block h-px transition-all duration-500 ${
+                  i === current ? 'w-8 bg-accent' : 'w-3 bg-white/30 hover:bg-white/55'
+                }`}
+              />
+            </button>
+          ))}
+        </div>
+        <span className="text-white/20 text-[9px] tracking-[0.35em]">
+          {String(current + 1).padStart(2, '0')} / {String(SLIDES.length).padStart(2, '0')}
+        </span>
       </div>
 
       {/* Scroll indicator */}
