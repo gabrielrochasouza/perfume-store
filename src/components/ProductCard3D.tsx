@@ -96,6 +96,15 @@ export function ProductCard3D({ product, large = false }: Props) {
               'linear-gradient(to top, rgba(15,15,15,0.97) 0%, rgba(15,15,15,0.65) 40%, rgba(15,15,15,0.12) 70%, transparent 100%)',
           }}
         />
+
+        {/* Top amber tint — visible before hover, fades on hover */}
+        <div
+          className="absolute inset-0 z-[2] group-hover:opacity-0 transition-opacity duration-500"
+          style={{
+            background:
+              'linear-gradient(to bottom, rgba(201,162,39,0.42) 0%, rgba(201,162,39,0.18) 38%, transparent 65%)',
+          }}
+        />
         <div
           className="absolute inset-0 z-[2] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
           style={{

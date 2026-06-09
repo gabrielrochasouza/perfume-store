@@ -1,10 +1,7 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-
-const PerfumeScene = dynamic(() => import('./PerfumeScene'), { ssr: false });
+import { GoldenNetwork } from './GoldenNetwork';
 
 const letterVariants = {
   hidden: { y: '110%' },
@@ -40,23 +37,11 @@ function RevealText({ text, className = '' }: { text: string; className?: string
 }
 
 export function HeroSection() {
-  const [mouse, setMouse] = useState({ x: 0, y: 0 });
-
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
-    setMouse({
-      x: (e.clientX / window.innerWidth - 0.5) * 2,
-      y: (e.clientY / window.innerHeight - 0.5) * 2,
-    });
-  }, []);
-
   return (
-    <section
-      className="relative min-h-screen bg-dark flex items-center overflow-hidden"
-      onMouseMove={handleMouseMove}
-    >
-      {/* 3D Canvas full background */}
+    <section className="relative min-h-screen bg-dark flex items-center overflow-hidden">
+      {/* Animated golden network background */}
       <div className="absolute inset-0 z-0">
-        <PerfumeScene mouseX={mouse.x} mouseY={mouse.y} />
+        <GoldenNetwork />
       </div>
 
       {/* Depth gradients */}
