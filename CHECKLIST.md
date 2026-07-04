@@ -4,7 +4,7 @@
 
 Data de Conclusão: **8 de Junho de 2026**
 
----
+----
 
 ## 📋 Requisitos Solicitados
 
